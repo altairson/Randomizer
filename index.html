@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <link rel="stylesheet" href="./css/main.css">
     <title>Document</title>
 </head>
@@ -28,6 +29,38 @@
             <textarea name="result" id="result_text" cols="30" rows="10"></textarea>
             <button id="copy">copy text</button>
         </section>
+        <div class="hidden">
+            <form id="form"  target="dummyframe" method="POST">
+                <input type="text" id="app_id" name="app_id">
+                <input type="text" id="month" name="month">
+                <input type="text" id="asigned_to" name="asigned_to">
+                <input type="text" id="box_index" name="box_index">
+                <button id="submit" type="submit">submit</button>
+            </form>
+        </div>
+        <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+        <div class="new-app hidden">
+            <form id="app_form" target="dummyframe" method="POST">
+                <input disabled type="number" id="id" name="id">
+                <input type="text" id="topic" name="topic">
+                <input type="password" id="password" name="password">
+                <button id="app_submit" type="submit">submit</button>
+            </form>
+        </div>
+
+        <div class="select-background">
+            <div class="select">
+                <select name="topics_select" id="topics_select">
+                    <option selected disabled value="-1">Selecteer een bestaand onderwerp</option>
+                </select>
+                <h4>Of</h4>
+                <button id="create_topic">Nieuw onderwerp aanmaken</button>
+                <div class="pass_input hidden">
+                    <input type="password" id="pass" placeholder="trefwoord">
+                    <button id="unlock">ontgrendelen</button>
+                </div>
+            </div>
+        </div>
     </main>
     <script src="./js/main.js"></script>
 </body>
