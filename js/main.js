@@ -1,11 +1,8 @@
 $(document).ready(function() {
-    const array_months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const array_months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
     var text = "";
-    var ids = [];
-    var topics = [];
-    var passwords = [];
-
-    var data = [];
+    var topic_datalist = [];
+    var datalist = [];
 
     $(".box").click(function(e) {
         $(this).addClass("selected");
@@ -67,6 +64,10 @@ $(document).ready(function() {
         sortText();
     }
 
+    $("#app_submit").click(function() {
+        location.reload();
+    })
+
     $("#unlock").click(function() {
         let pass = $("#pass").val();
         let id = $("#topics_select").val();
@@ -91,12 +92,12 @@ $(document).ready(function() {
     function displayData(id) {
         let boxes = $(".box");
         text = "";
-        for (let i = 0; i < data.length; i++) {
-            if(data[i].app_id == id) {
-                let box_text = `<h3>${data[i].asigned_to}</h3>\n<h1>${data[i].month.toUpperCase()}</h1>`;
-                text += `${data[i].month} ${data[i].asigned_to}\n`;
-                boxes[parseInt(data[i].box_index)].classList.add("selected");
-                removeElementFromArray(data[i].month);
+        for (let i = 1; i < datalist.length; i++) {
+            if(datalist[i][0] == id) {
+                let box_text = `<h3>${datalist[i][2]}</h3>\n<h1>${datalist[i][1].toUpperCase()}</h1>`;
+                text += `${datalist[i][1]} ${datalist[i][2]}\n`;
+                boxes[parseInt(datalist[i][3])].classList.add("selected");
+                removeElementFromArray(datalist[i][1]);
                 $(".selected").html("");
                 $(".selected").append(box_text);
                 $(".selected").addClass("picked");
@@ -108,9 +109,10 @@ $(document).ready(function() {
     }
 
     $("#create_topic").click(function() {
+        debugger
         let new_index = 0;
-        if (ids.length > 0) { 
-            new_index = parseInt(ids[ids.length - 1]) + 1;
+        if (topic_datalist.length > 1) { 
+            new_index = parseInt(topic_datalist[topic_datalist.length - 1][0]) + 1;
         }
         $("#id").val(new_index);
         $(".new-app").toggleClass("hidden");
@@ -118,7 +120,7 @@ $(document).ready(function() {
 
     function sortText() {
         sorted_text = "";
-        let sorted_months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        let sorted_months = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
         let text_array = text.split('\n');
         for(let i = 0; i < sorted_months.length; i++) {
             for(let j = 0; j < text_array.length; j++) {
@@ -142,6 +144,13 @@ $(document).ready(function() {
             pickNameAndRandomMonth();
         }
     })
+
+    $("#pass").keypress(function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            $("#unlock").click();
+        }
+    })
     
 
     function getRandomMonth(arr) {
@@ -163,52 +172,24 @@ $(document).ready(function() {
     }
 
     function read_write_app_names() {
-        const url = "https://script.google.com/macros/s/AKfycbwy3yOzvIBrPjtYzaa_1OQDPaLYpDvheAOwzwdtqmA6J09HwRD15npiBkOJkvjJAXlbgQ/exec";
+        const url = "https://script.google.com/macros/s/AKfycbzRERg_ZY_cbFU3a1Rd_BmfW8ETnyWGawqdKBH-ENUxFvqpcm9GO5eigmQZjFdzSbH0_A/exec";
         document.getElementById('app_form').action = url;
-        let index = 0;
 
-        fetch(`${url}?header=id`)
+        fetch(`${url}`)
             .then((response) => response.json())
             .then(({ data }) => {
-                ids = data;
-                console.log("id: " + data);
-                index++;
-                if(index == 3) {
-                    fillSelectOptions(ids, topics, passwords);
-                }
-            })
-        .catch((error) => console.error('!!!!!!!!', error));
-
-
-        fetch(`${url}?header=topic`)
-            .then((response) => response.json())
-            .then(({ data }) => {
-                topics = data;
-                console.log("topics: " + data);
-                index++;
-                if(index == 3) {
-                    fillSelectOptions(ids, topics, passwords);
-                }
-            })
-        .catch((error) => console.error('!!!!!!!!', error));
-
-        fetch(`${url}?header=password`)
-            .then((response) => response.json())
-            .then(({ data }) => {
-                passwords = data;
-                console.log("passwords: " + data);
-                index++;
-                if(index == 3) {
-                    fillSelectOptions(ids, topics, passwords);
-                }
+                topic_datalist = data;
+                console.log(topic_datalist);
+                fillSelectOptions();
             })
         .catch((error) => console.error('!!!!!!!!', error));
     }
 
-    function fillSelectOptions(ids, topics, passwords) {
-        for(let i = 0; i < ids.length; i++) {
-            let option = `<option data-password="${passwords[i]}" value="${ids[i]}">${topics[i]}</option>`;
+    function fillSelectOptions() {
+        for(let i = 1; i < topic_datalist.length; i++) {
+            let option = `<option data-password="${topic_datalist[i][2]}" value="${topic_datalist[i][0]}">${topic_datalist[i][1]}</option>`;
             $("#topics_select").append(option);
+            $(".loading").addClass('hidden');
         }
     }
 
@@ -218,77 +199,17 @@ $(document).ready(function() {
 
     read_write_app_names();
 
-
-    function combine_arrays(ids, months, names, boxes) {
-        for(let i = 0; i < ids.length; i++) {
-            let obj = {
-                app_id: ids[i],
-                month: months[i],
-                asigned_to: names[i],
-                box_index: boxes[i]
-            }
-            data.push(obj);
-        }
-    }
-
   function connectToSheets() {
-        let url = "https://script.google.com/macros/s/AKfycby9n0jh2Mjr-P9H9Rz3ARcgoDbanxNBmyilt83lne3AlY9U0D38RGmvknlr1LBETrqp/exec";
+        let url = "https://script.google.com/macros/s/AKfycbysLQdUbmLOutN-vBhhXvmJXenWm8UvPzyzY6TWdu3GHaBf_iuGQM--39Ih9UadHiD6/exec";
         document.getElementById('form').action = url;
-        let index = 0;
 
-        let app_ids = [];
-        let months = [];
-        let asigned_tos = [];
-        let box_indexes = [];
-
-        fetch(`${url}?header=app_id`)
+        fetch(`${url}`)
             .then((response) => response.json())
             .then(({ data }) => {
                 console.log(data);
-                app_ids = data;
-                index++;
-                if(index == 4) {
-                    combine_arrays(app_ids, months, asigned_tos, box_indexes);
-                }
+                datalist = data;
             })
-            .catch((error) => console.error('!!!!!!!!', error));
-
-            fetch(`${url}?header=month`)
-            .then((response) => response.json())
-            .then(({ data }) => {
-                console.log(data);
-                months = data;
-                index++;
-                if(index == 4) {
-                    combine_arrays(app_ids, months, asigned_tos, box_indexes);
-                }
-            })
-            .catch((error) => console.error('!!!!!!!!', error));
-
-            fetch(`${url}?header=asigned_to`)
-            .then((response) => response.json())
-            .then(({ data }) => {
-                console.log(data);
-                asigned_tos = data
-                index++;
-                if(index == 4) {
-                    combine_arrays(app_ids, months, asigned_tos, box_indexes);
-                }
-            })
-            .catch((error) => console.error('!!!!!!!!', error));
-
-            fetch(`${url}?header=box_index`)
-            .then((response) => response.json())
-            .then(({ data }) => {
-                console.log(data);
-                box_indexes = data;
-                index++;
-                if(index == 4) {
-                    combine_arrays(app_ids, months, asigned_tos, box_indexes);
-                }
-            })
-            .catch((error) => console.error('!!!!!!!!', error));
-
+            .catch((error) => console.log('!!!!!!!!', error));
   }
 
   connectToSheets();
