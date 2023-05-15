@@ -5,27 +5,29 @@ $(document).ready(function() {
     var datalist = [];
 
     $(".box").click(function(e) {
-        $(this).addClass("selected");
-        e.preventDefault();
-        let overlay = document.createElement("div");
-        overlay.id = "overlay";
-        let top = $(this).offset().top;
-        let left = $(this).offset().left;
-        let div = document.createElement("div");
-        div.style.top = top + "px";
-        div.style.left = left + "px";
-        div.id = "info";
-        let input = document.createElement("input");
-        input.placeholder = "your name";
-        input.id = "name";
-        div.appendChild(input);
-        let button = document.createElement("button");
-        button.innerText = "Random Month";
-        button.id = "random";
-        div.appendChild(button);
-        $("#main").append(overlay);
-        $("#main").append(div);
-        $("#name").focus();
+        if(!$(this).hasClass("picked")) {
+            $(this).addClass("selected");
+            e.preventDefault();
+            let overlay = document.createElement("div");
+            overlay.id = "overlay";
+            let top = $(this).offset().top;
+            let left = $(this).offset().left;
+            let div = document.createElement("div");
+            div.style.top = top + "px";
+            div.style.left = left + "px";
+            div.id = "info";
+            let input = document.createElement("input");
+            input.placeholder = "your name";
+            input.id = "name";
+            div.appendChild(input);
+            let button = document.createElement("button");
+            button.innerText = "Random Month";
+            button.id = "random";
+            div.appendChild(button);
+            $("#main").append(overlay);
+            $("#main").append(div);
+            $("#name").focus();
+        }
     })
 
     //delete month from array 
